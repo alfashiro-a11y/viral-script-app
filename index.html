@@ -1,21 +1,75 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Viral Script App</title>
+<title>AI Viral Script Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{
+  font-family: Arial;
+  background:#0f0f0f;
+  color:white;
+  padding:20px;
+}
+textarea{
+  width:100%;
+  height:120px;
+  border-radius:10px;
+  padding:10px;
+}
+button{
+  padding:12px 20px;
+  border:none;
+  border-radius:10px;
+  background:#ff0050;
+  color:white;
+  font-weight:bold;
+  margin-top:10px;
+}
+#output{
+  margin-top:20px;
+  white-space:pre-line;
+  background:#1a1a1a;
+  padding:15px;
+  border-radius:10px;
+}
+</style>
 </head>
 <body>
-  <h1>Web Pertama Jalan 🔥</h1>
-  <textarea id="input" placeholder="Masukkan teks..." rows="5" cols="30"></textarea>
-  <br><br>
-  <button onclick="generate()">Generate</button>
-  <p id="output"></p>
 
-  <script>
-    function generate() {
-      const text = document.getElementById("input").value;
-      document.getElementById("output").innerText =
-        "HOOK 🔥 " + text + " wajib kamu tahu!";
-    }
-  </script>
+<h2>🔥 AI Viral Script Generator</h2>
+
+<textarea id="input" placeholder="Masukkan deskripsi produk..."></textarea>
+<br>
+<button onclick="generate()">Generate Script</button>
+<button onclick="speak()">🔊 Play Voice</button>
+
+<div id="output"></div>
+
+<script>
+function generate(){
+  const text = document.getElementById("input").value;
+  document.getElementById("output").innerText =
+`🔥 HOOK:
+Kamu gak akan nyangka ini!
+
+😱 MASALAH:
+${text} sering bikin orang salah pilih...
+
+💡 SOLUSI:
+Ini solusi terbaik yang bisa kamu pakai sekarang juga!
+
+🚀 CTA:
+Klik sekarang sebelum kehabisan!`;
+}
+
+function speak(){
+  const text = document.getElementById("output").innerText;
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.lang = "id-ID";
+  speech.rate = 1;
+  speechSynthesis.speak(speech);
+}
+</script>
+
 </body>
 </html>
