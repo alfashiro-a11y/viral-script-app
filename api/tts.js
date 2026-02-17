@@ -10,37 +10,38 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Text is required" });
     }
 
-    const VOICE_ID = "6f0267ca8dd24e39a2905d5782f99e40";
+    const voiceId = "YOUR_VOICE_ID"; // ganti dengan voice ID kamu
 
     const response = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
+      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
       {
         method: "POST",
         headers: {
-          "Accept": "audio/wav",
           "xi-api-key": process.env.ELEVEN_API_KEY,
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Accept": "audio/wav"
         },
         body: JSON.stringify({
           text: text,
           model_id: "eleven_multilingual_v2",
-          output_format: "wav"
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.8
+          }
         })
       }
     );
 
     if (!response.ok) {
-      const errText = await response.text();
-      return res.status(500).json({ error: errText });
+      const err = await response.text();
+      return res.status(500).json({ error: err });
     }
 
     const audioBuffer = await response.arrayBuffer();
 
     res.setHeader("Content-Type", "audio/wav");
-    res.setHeader("Content-Disposition", "inline; filename=voice.wav");
     res.send(Buffer.from(audioBuffer));
-
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 }
