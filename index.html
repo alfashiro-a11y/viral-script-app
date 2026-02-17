@@ -5,11 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Viral Script Generator</title>
 
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+
 <style>
-body {
+body{
   margin:0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg,#0f0f0f,#1c1c1c);
+  font-family:Arial;
+  background:#0f0f0f;
   color:white;
 }
 
@@ -19,18 +21,13 @@ body {
   padding:20px;
 }
 
-h2{
-  font-size:22px;
-}
-
 textarea{
   width:100%;
-  height:120px;
+  height:100px;
   border-radius:12px;
+  padding:10px;
   border:none;
-  padding:15px;
-  font-size:14px;
-  margin-top:15px;
+  margin-top:10px;
 }
 
 button{
@@ -38,21 +35,13 @@ button{
   padding:14px;
   border:none;
   border-radius:12px;
-  margin-top:12px;
+  margin-top:10px;
   font-weight:bold;
-  font-size:15px;
   cursor:pointer;
 }
 
-.generate{
-  background:#ff2d2d;
-  color:white;
-}
-
-.voice{
-  background:#333;
-  color:white;
-}
+.generate{ background:#ff2d2d; color:white; }
+.voice{ background:#333; color:white; }
 
 #output{
   margin-top:20px;
@@ -60,7 +49,12 @@ button{
   padding:15px;
   border-radius:12px;
   white-space:pre-line;
-  font-size:14px;
+}
+
+.loader{
+  margin-top:10px;
+  font-size:13px;
+  color:#aaa;
 }
 </style>
 </head>
@@ -68,52 +62,75 @@ button{
 <body>
 
 <div class="container">
-  <h2>🔥 AI Viral Script Generator</h2>
+<h2>🔥 AI Viral Script Generator</h2>
 
-  <textarea id="input" placeholder="Masukkan deskripsi produk..."></textarea>
+<input type="file" id="imageInput" accept="image/*">
+<div class="loader" id="loading"></div>
 
-  <button class="generate" onclick="generate()">Generate Script</button>
-  <button class="voice" onclick="speak()">Play Voice</button>
+<textarea id="input" placeholder="Atau ketik manual di sini..."></textarea>
 
-  <div id="output"></div>
+<button class="generate" onclick="generate()">Generate Script</button>
+<button class="voice" onclick="speak()">Play Voice</button>
+
+<div id="output"></div>
 </div>
 
 <script>
-function generate() {
+const imageInput = document.getElementById("imageInput");
+const loading = document.getElementById("loading");
+
+imageInput.addEventListener("change", function(){
+  const file = imageInput.files[0];
+  if(!file) return;
+
+  loading.innerText = "Membaca gambar... tunggu sebentar ⏳";
+
+  Tesseract.recognize(
+    file,
+    'ind',
+    { logger: m => console.log(m) }
+  ).then(({ data: { text } }) => {
+      document.getElementById("input").value = text;
+      loading.innerText = "Teks berhasil diambil ✅";
+  }).catch(()=>{
+      loading.innerText = "Gagal membaca gambar ❌";
+  });
+});
+
+function generate(){
   const text = document.getElementById("input").value;
 
-  if (!text) {
+  if(!text){
     alert("Masukkan deskripsi dulu!");
     return;
   }
 
   const result = `
 🔥 HOOK:
-Kamu gak akan nyangka ini!
+Stop scroll! Ini penting banget!
 
 😱 MASALAH:
-${text} sering bikin orang salah pilih...
+${text} sering bikin orang ragu sebelum beli...
 
 💡 SOLUSI:
-Ini solusi terbaik yang bisa kamu pakai sekarang juga!
+Sekarang ada solusi yang lebih praktis dan menguntungkan!
 
 🚀 CTA:
-Klik sekarang sebelum kehabisan!
+Buruan klik sebelum promo habis!
 `;
 
   document.getElementById("output").innerText = result;
 }
 
-function speak() {
+function speak(){
   const text = document.getElementById("output").innerText;
 
-  if (!text) {
+  if(!text){
     alert("Generate script dulu!");
     return;
   }
 
   const speech = new SpeechSynthesisUtterance(text);
-
   speech.lang = "id-ID";
   speech.rate = 1;
   speech.pitch = 1;
