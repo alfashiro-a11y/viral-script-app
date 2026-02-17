@@ -1,28 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Script Generator</title>
+<title>AI Viral Script Generator</title>
 
 <style>
-body{
+body {
   margin:0;
-  font-family:Arial, sans-serif;
-  background:linear-gradient(135deg,#111,#1f1f1f);
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#0f0f0f,#1c1c1c);
   color:white;
-  display:flex;
-  justify-content:center;
 }
 
 .container{
-  width:100%;
   max-width:500px;
+  margin:40px auto;
   padding:20px;
 }
 
 h2{
-  text-align:center;
-  margin-bottom:20px;
+  font-size:22px;
 }
 
 textarea{
@@ -30,8 +28,9 @@ textarea{
   height:120px;
   border-radius:12px;
   border:none;
-  padding:12px;
+  padding:15px;
   font-size:14px;
+  margin-top:15px;
 }
 
 button{
@@ -39,14 +38,14 @@ button{
   padding:14px;
   border:none;
   border-radius:12px;
-  margin-top:10px;
+  margin-top:12px;
   font-weight:bold;
-  cursor:pointer;
   font-size:15px;
+  cursor:pointer;
 }
 
 .generate{
-  background:#ff3c3c;
+  background:#ff2d2d;
   color:white;
 }
 
@@ -57,10 +56,11 @@ button{
 
 #output{
   margin-top:20px;
-  background:#1a1a1a;
+  background:#111;
   padding:15px;
   border-radius:12px;
   white-space:pre-line;
+  font-size:14px;
 }
 </style>
 </head>
@@ -68,22 +68,26 @@ button{
 <body>
 
 <div class="container">
-<h2>🔥 AI Viral Script Generator</h2>
+  <h2>🔥 AI Viral Script Generator</h2>
 
-<textarea id="input" placeholder="Masukkan deskripsi produk..."></textarea>
+  <textarea id="input" placeholder="Masukkan deskripsi produk..."></textarea>
 
-<button class="generate" onclick="generate()">Generate Script</button>
-<button class="voice" onclick="speak()">Play Voice</button>
+  <button class="generate" onclick="generate()">Generate Script</button>
+  <button class="voice" onclick="speak()">Play Voice</button>
 
-<div id="output"></div>
+  <div id="output"></div>
 </div>
 
 <script>
-
 function generate() {
   const text = document.getElementById("input").value;
 
-  document.getElementById("output").innerText = `
+  if (!text) {
+    alert("Masukkan deskripsi dulu!");
+    return;
+  }
+
+  const result = `
 🔥 HOOK:
 Kamu gak akan nyangka ini!
 
@@ -96,4 +100,28 @@ Ini solusi terbaik yang bisa kamu pakai sekarang juga!
 🚀 CTA:
 Klik sekarang sebelum kehabisan!
 `;
+
+  document.getElementById("output").innerText = result;
 }
+
+function speak() {
+  const text = document.getElementById("output").innerText;
+
+  if (!text) {
+    alert("Generate script dulu!");
+    return;
+  }
+
+  const speech = new SpeechSynthesisUtterance(text);
+
+  speech.lang = "id-ID";
+  speech.rate = 1;
+  speech.pitch = 1;
+
+  speechSynthesis.cancel();
+  speechSynthesis.speak(speech);
+}
+</script>
+
+</body>
+</html>
