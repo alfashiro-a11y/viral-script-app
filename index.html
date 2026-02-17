@@ -1,184 +1,94 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Viral Script PRO</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Viral Script PRO</title>
 
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f0f0f;
+      color: white;
+      text-align: center;
+      padding: 30px;
+    }
 
-<style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:linear-gradient(135deg,#0f0f0f,#1c1c1c);
-  color:white;
-}
-.container{
-  max-width:500px;
-  margin:40px auto;
-  padding:20px;
-}
-textarea, select{
-  width:100%;
-  padding:12px;
-  border-radius:12px;
-  border:none;
-  margin-top:10px;
-}
-button{
-  width:100%;
-  padding:14px;
-  border:none;
-  border-radius:12px;
-  margin-top:10px;
-  font-weight:bold;
-  cursor:pointer;
-}
-.generate{background:#ff2d2d;color:white;}
-.voice{background:#333;color:white;}
-.copy{background:#555;color:white;}
-#output{
-  margin-top:20px;
-  background:#111;
-  padding:15px;
-  border-radius:12px;
-  white-space:pre-line;
-}
-.loader{
-  font-size:13px;
-  color:#aaa;
-  margin-top:5px;
-}
-</style>
+    textarea {
+      width: 100%;
+      max-width: 500px;
+      height: 120px;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 15px;
+    }
+
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      background: red;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    audio {
+      margin-top: 20px;
+      width: 100%;
+      max-width: 500px;
+    }
+  </style>
 </head>
-
 <body>
 
-<div class="container">
-<h2>🔥 AI Viral Script PRO</h2>
+  <h1>🔥 AI Viral Script PRO</h1>
 
-<input type="file" id="imageInput" accept="image/*">
-<div class="loader" id="loading"></div>
+  <textarea id="textInput" placeholder="Masukkan teks untuk dibuat suara..."></textarea>
+  <br>
+  <button onclick="generateVoice()">Generate Suara</button>
 
-<textarea id="input" placeholder="Masukkan atau upload deskripsi produk..."></textarea>
+  <audio id="audioPlayer" controls></audio>
 
-<select id="style">
-  <option value="hard">Hard Sell</option>
-  <option value="soft">Soft Sell</option>
-  <option value="story">Storytelling</option>
-</select>
+  <script>
+    async function generateVoice() {
+      const text = document.getElementById("textInput").value;
 
-<button class="generate" onclick="generate()">Generate Script</button>
-<button class="voice" onclick="speak()">Play Voice AI</button>
-<button class="copy" onclick="copyScript()">Copy Script</button>
+      if (!text) {
+        alert("Masukkan teks dulu!");
+        return;
+      }
 
-<div id="output"></div>
-</div>
+      try {
+        const response = await fetch("/api/tts", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ text })
+        });
 
-<script>
+        if (!response.ok) {
+          const err = await response.json();
+          alert("Error: " + (err.error || "Gagal generate suara"));
+          return;
+        }
 
-// ================= OCR =================
-const imageInput = document.getElementById("imageInput");
-const loading = document.getElementById("loading");
+        const blob = await response.blob();
+        const audioUrl = URL.createObjectURL(blob);
 
-imageInput.addEventListener("change", function(){
-  const file = imageInput.files[0];
-  if(!file) return;
+        const audioPlayer = document.getElementById("audioPlayer");
+        audioPlayer.src = audioUrl;
+        audioPlayer.play();
 
-  loading.innerText = "Membaca gambar... ⏳";
-
-  Tesseract.recognize(file,'eng+ind')
-  .then(({ data: { text } }) => {
-      document.getElementById("input").value =
-        text.replace(/\n+/g," ").replace(/\s\s+/g," ");
-      loading.innerText = "Teks berhasil diambil ✅";
-  })
-  .catch(()=> loading.innerText="Gagal membaca gambar ❌");
-});
-
-// ================= GENERATE SCRIPT =================
-function generate(){
-  const text = document.getElementById("input").value;
-  const style = document.getElementById("style").value;
-
-  if(!text){
-    alert("Masukkan deskripsi dulu!");
-    return;
-  }
-
-  let script = "";
-
-  if(style === "hard"){
-    script = `STOP SCROLL!
-
-${text} ini lagi viral banget!
-Jangan sampai kamu ketinggalan!
-Buruan klik sebelum kehabisan!`;
-  }
-
-  if(style === "soft"){
-    script = `Pernah ngalamin ini?
-
-${text}
-
-Sekarang ada solusi yang lebih nyaman dan praktis.
-Coba sekarang dan rasakan bedanya.`;
-  }
-
-  if(style === "story"){
-    script = `Awalnya banyak orang ragu soal ${text}.
-Tapi setelah coba, hasilnya bikin kaget.
-Sekarang makin banyak yang pakai dan repeat order.`;
-  }
-
-  document.getElementById("output").innerText = script;
-}
-
-// ================= GEMINI TTS =================
-async function speak(){
-  let text = document.getElementById("output").innerText;
-
-  if(!text){
-    alert("Generate dulu!");
-    return;
-  }
-
-  const res = await fetch("/api/tts", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ text })
-  });
-
-  const data = await res.json();
-
-  if(!data.audio){
-    alert("Gagal generate suara");
-    return;
-  }
-
-  const byteCharacters = atob(data.audio);
-  const byteNumbers = new Array(byteCharacters.length);
-
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
-  }
-
-  const blob = new Blob([new Uint8Array(byteNumbers)], { type: "audio/wav" });
-  const url = URL.createObjectURL(blob);
-
-  const audio = new Audio(url);
-  audio.play();
-}
-
-// ================= COPY =================
-function copyScript(){
-  const text = document.getElementById("output").innerText;
-  navigator.clipboard.writeText(text);
-  alert("Script berhasil di-copy!");
-}
-
-</script>
+      } catch (error) {
+        alert("Gagal generate suara");
+        console.error(error);
+      }
+    }
+  </script>
 
 </body>
 </html>
