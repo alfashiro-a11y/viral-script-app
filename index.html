@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Viral Script Pro</title>
+<title>AI Viral Script PRO</title>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
 
@@ -19,7 +19,7 @@ body{
   margin:40px auto;
   padding:20px;
 }
-select, textarea{
+textarea, select{
   width:100%;
   padding:12px;
   border-radius:12px;
@@ -52,6 +52,7 @@ button{
 }
 </style>
 </head>
+
 <body>
 
 <div class="container">
@@ -68,14 +69,8 @@ button{
   <option value="story">Storytelling</option>
 </select>
 
-<select id="duration">
-  <option value="15">15 Detik</option>
-  <option value="30">30 Detik</option>
-  <option value="60">60 Detik</option>
-</select>
-
 <button class="generate" onclick="generate()">Generate Script</button>
-<button class="voice" onclick="speak()">Play Voice</button>
+<button class="voice" onclick="speak()">Play Voice AI</button>
 <button class="copy" onclick="copyScript()">Copy Script</button>
 
 <div id="output"></div>
@@ -83,7 +78,7 @@ button{
 
 <script>
 
-// ===== OCR =====
+// ================= OCR =================
 const imageInput = document.getElementById("imageInput");
 const loading = document.getElementById("loading");
 
@@ -102,11 +97,10 @@ imageInput.addEventListener("change", function(){
   .catch(()=> loading.innerText="Gagal membaca gambar ❌");
 });
 
-// ===== GENERATE =====
+// ================= GENERATE SCRIPT =================
 function generate(){
   const text = document.getElementById("input").value;
   const style = document.getElementById("style").value;
-  const duration = document.getElementById("duration").value;
 
   if(!text){
     alert("Masukkan deskripsi dulu!");
@@ -116,16 +110,18 @@ function generate(){
   let script = "";
 
   if(style === "hard"){
-    script = `STOP SCROLL! 
+    script = `STOP SCROLL!
+
 ${text} ini lagi viral banget!
 Jangan sampai kamu ketinggalan!
-Cuma hari ini harga spesial!
-Buruan klik sebelum habis!`;
+Buruan klik sebelum kehabisan!`;
   }
 
   if(style === "soft"){
     script = `Pernah ngalamin ini?
+
 ${text}
+
 Sekarang ada solusi yang lebih nyaman dan praktis.
 Coba sekarang dan rasakan bedanya.`;
   }
@@ -136,41 +132,53 @@ Tapi setelah coba, hasilnya bikin kaget.
 Sekarang makin banyak yang pakai dan repeat order.`;
   }
 
-  script += `
-
-(Durasi sekitar ${duration} detik)`;
-
   document.getElementById("output").innerText = script;
 }
 
-// ===== VOICE =====
-function speak(){
+// ================= GEMINI TTS =================
+async function speak(){
   let text = document.getElementById("output").innerText;
+
   if(!text){
     alert("Generate dulu!");
     return;
   }
 
-  const speech = new SpeechSynthesisUtterance(text);
-  speech.lang = "id-ID";
-  speech.rate = 1;
-  speech.pitch = 1;
+  const res = await fetch("/api/tts", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ text })
+  });
 
-  speechSynthesis.cancel();
-  speechSynthesis.speak(speech);
+  const data = await res.json();
+
+  if(!data.audio){
+    alert("Gagal generate suara");
+    return;
+  }
+
+  const byteCharacters = atob(data.audio);
+  const byteNumbers = new Array(byteCharacters.length);
+
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+
+  const blob = new Blob([new Uint8Array(byteNumbers)], { type: "audio/wav" });
+  const url = URL.createObjectURL(blob);
+
+  const audio = new Audio(url);
+  audio.play();
 }
 
-// ===== COPY =====
+// ================= COPY =================
 function copyScript(){
   const text = document.getElementById("output").innerText;
   navigator.clipboard.writeText(text);
   alert("Script berhasil di-copy!");
 }
 
-speechSynthesis.onvoiceschanged = () => {
-  speechSynthesis.getVoices();
-};
-
 </script>
+
 </body>
 </html>
