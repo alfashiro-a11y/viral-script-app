@@ -11,30 +11,29 @@ export default async function handler(req, res) {
     }
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      "https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM",
       {
         method: "POST",
         headers: {
+          "xi-api-key": process.env.ELEVEN_API_KEY,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text }]
-            }
-          ]
+          text: text,
+          model_id: "eleven_multilingual_v2"
         })
       }
     );
 
-    const data = await response.json();
+    if (!response.ok) {
+      const err = await response.text();
+      return res.status(500).json({ error: err });
+    }
 
-    const output =
-      data.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "Tidak ada respon dari Gemini";
+    const audioBuffer = await response.arrayBuffer();
 
-    res.status(200).json({ result: output });
-
+    res.setHeader("Content-Type", "audio/mpeg");
+    res.send(Buffer.from(audioBuffer));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
