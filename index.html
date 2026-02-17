@@ -79,10 +79,12 @@ button{
 </div>
 
 <script>
-function generate(){
+
+function generate() {
   const text = document.getElementById("input").value;
-  document.getElementById("output").innerText =
-`🔥 HOOK:
+
+  document.getElementById("output").innerText = `
+🔥 HOOK:
 Kamu gak akan nyangka ini!
 
 😱 MASALAH:
@@ -92,18 +94,6 @@ ${text} sering bikin orang salah pilih...
 Ini solusi terbaik yang bisa kamu pakai sekarang juga!
 
 🚀 CTA:
-Klik sekarang sebelum kehabisan!`;
+Klik sekarang sebelum kehabisan!
+`;
 }
-
-function speak(){
-  const text = document.getElementById("output").innerText;
-  const speech = new SpeechSynthesisUtterance(text);
-  speech.lang="id-ID";
-  speech.rate=1;
-  speech.pitch=1;
-  speechSynthesis.speak(speech);
-}
-</script>
-
-</body>
-</html>
