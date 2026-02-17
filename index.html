@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Viral Script Generator</title>
+<title>AI Viral Script Pro</title>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
 
@@ -11,25 +11,21 @@
 body{
   margin:0;
   font-family:Arial;
-  background:#0f0f0f;
+  background:linear-gradient(135deg,#0f0f0f,#1c1c1c);
   color:white;
 }
-
 .container{
   max-width:500px;
   margin:40px auto;
   padding:20px;
 }
-
-textarea{
+select, textarea{
   width:100%;
-  height:100px;
+  padding:12px;
   border-radius:12px;
-  padding:10px;
   border:none;
   margin-top:10px;
 }
-
 button{
   width:100%;
   padding:14px;
@@ -39,10 +35,9 @@ button{
   font-weight:bold;
   cursor:pointer;
 }
-
-.generate{ background:#ff2d2d; color:white; }
-.voice{ background:#333; color:white; }
-
+.generate{background:#ff2d2d;color:white;}
+.voice{background:#333;color:white;}
+.copy{background:#555;color:white;}
 #output{
   margin-top:20px;
   background:#111;
@@ -50,32 +45,45 @@ button{
   border-radius:12px;
   white-space:pre-line;
 }
-
 .loader{
-  margin-top:10px;
   font-size:13px;
   color:#aaa;
+  margin-top:5px;
 }
 </style>
 </head>
-
 <body>
 
 <div class="container">
-<h2>🔥 AI Viral Script Generator</h2>
+<h2>🔥 AI Viral Script PRO</h2>
 
 <input type="file" id="imageInput" accept="image/*">
 <div class="loader" id="loading"></div>
 
-<textarea id="input" placeholder="Atau ketik manual di sini..."></textarea>
+<textarea id="input" placeholder="Masukkan atau upload deskripsi produk..."></textarea>
+
+<select id="style">
+  <option value="hard">Hard Sell</option>
+  <option value="soft">Soft Sell</option>
+  <option value="story">Storytelling</option>
+</select>
+
+<select id="duration">
+  <option value="15">15 Detik</option>
+  <option value="30">30 Detik</option>
+  <option value="60">60 Detik</option>
+</select>
 
 <button class="generate" onclick="generate()">Generate Script</button>
 <button class="voice" onclick="speak()">Play Voice</button>
+<button class="copy" onclick="copyScript()">Copy Script</button>
 
 <div id="output"></div>
 </div>
 
 <script>
+
+// ===== OCR =====
 const imageInput = document.getElementById("imageInput");
 const loading = document.getElementById("loading");
 
@@ -83,50 +91,63 @@ imageInput.addEventListener("change", function(){
   const file = imageInput.files[0];
   if(!file) return;
 
-  loading.innerText = "Membaca gambar... tunggu sebentar ⏳";
+  loading.innerText = "Membaca gambar... ⏳";
 
-  Tesseract.recognize(
-    file,
-    'ind',
-    { logger: m => console.log(m) }
-  ).then(({ data: { text } }) => {
-      document.getElementById("input").value = text;
+  Tesseract.recognize(file,'eng+ind')
+  .then(({ data: { text } }) => {
+      document.getElementById("input").value =
+        text.replace(/\n+/g," ").replace(/\s\s+/g," ");
       loading.innerText = "Teks berhasil diambil ✅";
-  }).catch(()=>{
-      loading.innerText = "Gagal membaca gambar ❌";
-  });
+  })
+  .catch(()=> loading.innerText="Gagal membaca gambar ❌");
 });
 
+// ===== GENERATE =====
 function generate(){
   const text = document.getElementById("input").value;
+  const style = document.getElementById("style").value;
+  const duration = document.getElementById("duration").value;
 
   if(!text){
     alert("Masukkan deskripsi dulu!");
     return;
   }
 
-  const result = `
-🔥 HOOK:
-Stop scroll! Ini penting banget!
+  let script = "";
 
-😱 MASALAH:
-${text} sering bikin orang ragu sebelum beli...
+  if(style === "hard"){
+    script = `STOP SCROLL! 
+${text} ini lagi viral banget!
+Jangan sampai kamu ketinggalan!
+Cuma hari ini harga spesial!
+Buruan klik sebelum habis!`;
+  }
 
-💡 SOLUSI:
-Sekarang ada solusi yang lebih praktis dan menguntungkan!
+  if(style === "soft"){
+    script = `Pernah ngalamin ini?
+${text}
+Sekarang ada solusi yang lebih nyaman dan praktis.
+Coba sekarang dan rasakan bedanya.`;
+  }
 
-🚀 CTA:
-Buruan klik sebelum promo habis!
-`;
+  if(style === "story"){
+    script = `Awalnya banyak orang ragu soal ${text}.
+Tapi setelah coba, hasilnya bikin kaget.
+Sekarang makin banyak yang pakai dan repeat order.`;
+  }
 
-  document.getElementById("output").innerText = result;
+  script += `
+
+(Durasi sekitar ${duration} detik)`;
+
+  document.getElementById("output").innerText = script;
 }
 
+// ===== VOICE =====
 function speak(){
-  const text = document.getElementById("output").innerText;
-
+  let text = document.getElementById("output").innerText;
   if(!text){
-    alert("Generate script dulu!");
+    alert("Generate dulu!");
     return;
   }
 
@@ -138,7 +159,18 @@ function speak(){
   speechSynthesis.cancel();
   speechSynthesis.speak(speech);
 }
-</script>
 
+// ===== COPY =====
+function copyScript(){
+  const text = document.getElementById("output").innerText;
+  navigator.clipboard.writeText(text);
+  alert("Script berhasil di-copy!");
+}
+
+speechSynthesis.onvoiceschanged = () => {
+  speechSynthesis.getVoices();
+};
+
+</script>
 </body>
 </html>
