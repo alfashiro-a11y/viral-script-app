@@ -10,36 +10,45 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Text kosong" });
     }
 
-    const voiceId = "o5s6XRBkPSTD4syv6mZg"; // 🔥 satu suara tetap
-    const apiKey = process.env.ELEVENLABS_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+      return res.status(500).json({ error: "API KEY GEMINI KOSONG" });
+    }
 
     const response = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey,
       {
         method: "POST",
         headers: {
-          "xi-api-key": apiKey,
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          text: text,
-          model_id: "eleven_multilingual_v2",
-          output_format: "mp3_44100_128"
-        })
+          contents: [
+            {
+              parts: [
+                {
+                  text: `Ubah teks berikut menjadi script voice over jualan yang natural dan emosional:\n\n${text}`
+                }
+              ]
+            }
+          ]
+        }),
       }
     );
 
+    const data = await response.json();
+
     if (!response.ok) {
-      const err = await response.text();
-      return res.status(500).json({ error: err });
+      return res.status(500).json({ error: data });
     }
 
-    const audioBuffer = await response.arrayBuffer();
+    const resultText =
+      data.candidates?.[0]?.content?.parts?.[0]?.text || "Gagal generate";
 
-    res.setHeader("Content-Type", "audio/mpeg");
-    res.send(Buffer.from(audioBuffer));
+    return res.status(200).json({ script: resultText });
 
-  } catch (error) {
-    res.status(500).json({ error: "Server error" });
+  } catch (err) {
+    return res.status(500).json({ error: "Server error" });
   }
 }
