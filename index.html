@@ -1,94 +1,37 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Viral Script PRO</title>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f0f0f;
-      color: white;
-      text-align: center;
-      padding: 30px;
-    }
-
-    textarea {
-      width: 100%;
-      max-width: 500px;
-      height: 120px;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      margin-bottom: 15px;
-    }
-
-    button {
-      padding: 12px 20px;
-      border: none;
-      border-radius: 8px;
-      background: red;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      margin: 5px;
-    }
-
-    audio {
-      margin-top: 20px;
-      width: 100%;
-      max-width: 500px;
-    }
-  </style>
-</head>
+<html>
 <body>
+  <h2>Test ElevenLabs</h2>
 
-  <h1>🔥 AI Viral Script PRO</h1>
+  <textarea id="text" placeholder="Tulis teks di sini"></textarea>
+  <br><br>
+  <button onclick="speak()">Generate Suara</button>
 
-  <textarea id="textInput" placeholder="Masukkan teks untuk dibuat suara..."></textarea>
-  <br>
-  <button onclick="generateVoice()">Generate Suara</button>
-
-  <audio id="audioPlayer" controls></audio>
+  <audio id="player" controls></audio>
 
   <script>
-    async function generateVoice() {
-      const text = document.getElementById("textInput").value;
+    async function speak() {
+      const text = document.getElementById("text").value;
 
-      if (!text) {
-        alert("Masukkan teks dulu!");
+      const res = await fetch("/api/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        alert("Error: " + JSON.stringify(err));
         return;
       }
 
-      try {
-        const response = await fetch("/api/tts", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ text })
-        });
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
 
-        if (!response.ok) {
-          const err = await response.json();
-          alert("Error: " + (err.error || "Gagal generate suara"));
-          return;
-        }
-
-        const blob = await response.blob();
-        const audioUrl = URL.createObjectURL(blob);
-
-        const audioPlayer = document.getElementById("audioPlayer");
-        audioPlayer.src = audioUrl;
-        audioPlayer.play();
-
-      } catch (error) {
-        alert("Gagal generate suara");
-        console.error(error);
-      }
+      const player = document.getElementById("player");
+      player.src = url;
+      player.play();
     }
   </script>
-
 </body>
 </html>
