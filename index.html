@@ -1,49 +1,82 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>AI Viral Script Generator</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Script Generator</title>
+
 <style>
 body{
-  font-family: Arial;
-  background:#0f0f0f;
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:linear-gradient(135deg,#111,#1f1f1f);
   color:white;
+  display:flex;
+  justify-content:center;
+}
+
+.container{
+  width:100%;
+  max-width:500px;
   padding:20px;
 }
+
+h2{
+  text-align:center;
+  margin-bottom:20px;
+}
+
 textarea{
   width:100%;
   height:120px;
-  border-radius:10px;
-  padding:10px;
-}
-button{
-  padding:12px 20px;
+  border-radius:12px;
   border:none;
-  border-radius:10px;
-  background:#ff0050;
-  color:white;
-  font-weight:bold;
-  margin-top:10px;
+  padding:12px;
+  font-size:14px;
 }
+
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  margin-top:10px;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:15px;
+}
+
+.generate{
+  background:#ff3c3c;
+  color:white;
+}
+
+.voice{
+  background:#333;
+  color:white;
+}
+
 #output{
   margin-top:20px;
-  white-space:pre-line;
   background:#1a1a1a;
   padding:15px;
-  border-radius:10px;
+  border-radius:12px;
+  white-space:pre-line;
 }
 </style>
 </head>
+
 <body>
 
+<div class="container">
 <h2>🔥 AI Viral Script Generator</h2>
 
 <textarea id="input" placeholder="Masukkan deskripsi produk..."></textarea>
-<br>
-<button onclick="generate()">Generate Script</button>
-<button onclick="speak()">🔊 Play Voice</button>
+
+<button class="generate" onclick="generate()">Generate Script</button>
+<button class="voice" onclick="speak()">Play Voice</button>
 
 <div id="output"></div>
+</div>
 
 <script>
 function generate(){
@@ -65,8 +98,9 @@ Klik sekarang sebelum kehabisan!`;
 function speak(){
   const text = document.getElementById("output").innerText;
   const speech = new SpeechSynthesisUtterance(text);
-  speech.lang = "id-ID";
-  speech.rate = 1;
+  speech.lang="id-ID";
+  speech.rate=1;
+  speech.pitch=1;
   speechSynthesis.speak(speech);
 }
 </script>
