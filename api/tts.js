@@ -10,25 +10,28 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Text is required" });
     }
 
+    const VOICE_ID = "6f0267ca8dd24e39a2905d5782f99e40";
+
     const response = await fetch(
-      "https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=wav",
+      `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
       {
         method: "POST",
         headers: {
+          "Accept": "audio/wav",
           "xi-api-key": process.env.ELEVEN_API_KEY,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
           text: text,
-          model_id: "eleven_multilingual_v2"
+          model_id: "eleven_multilingual_v2",
+          output_format: "wav"
         })
       }
     );
 
     if (!response.ok) {
-      const err = await response.text();
-      console.log("Eleven error:", err);
-      return res.status(500).json({ error: err });
+      const errText = await response.text();
+      return res.status(500).json({ error: errText });
     }
 
     const audioBuffer = await response.arrayBuffer();
@@ -38,7 +41,6 @@ export default async function handler(req, res) {
     res.send(Buffer.from(audioBuffer));
 
   } catch (error) {
-    console.log("Server error:", error);
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 }
