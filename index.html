@@ -1,37 +1,33 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <title>Gemini TTS Test</title>
+</head>
 <body>
-  <h2>Test ElevenLabs</h2>
 
-  <textarea id="text" placeholder="Tulis teks di sini"></textarea>
-  <br><br>
-  <button onclick="speak()">Generate Suara</button>
+<h1>Test Gemini TTS</h1>
 
-  <audio id="player" controls></audio>
+<textarea id="text">Halo Indonesia, ini tes suara Gemini.</textarea>
+<br><br>
+<button onclick="play()">Play</button>
 
-  <script>
-    async function speak() {
-      const text = document.getElementById("text").value;
+<script>
+async function play() {
+  const text = document.getElementById("text").value;
 
-      const res = await fetch("/api/tts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text })
-      });
+  const res = await fetch("/api/tts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text })
+  });
 
-      if (!res.ok) {
-        const err = await res.json();
-        alert("Error: " + JSON.stringify(err));
-        return;
-      }
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
 
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
+  const audio = new Audio(url);
+  audio.play();
+}
+</script>
 
-      const player = document.getElementById("player");
-      player.src = url;
-      player.play();
-    }
-  </script>
 </body>
 </html>
