@@ -28,8 +28,7 @@ export default async function handler(req, res) {
   generationConfig: {
     responseModalities: ["AUDIO"],
     audioConfig: {
-      audioEncoding: "LINEAR16",
-      sampleRateHertz: 24000
+      audioEncoding: "LINEAR16"
     }
   }
 })
