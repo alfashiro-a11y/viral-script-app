@@ -38,17 +38,18 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    const audioBase64 =
-      data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+const audioBase64 =
+  data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
 
-    if (!audioBase64) {
-      return res.status(500).json({ error: "Audio tidak ditemukan" });
-    }
+if (!audioBase64) {
+  console.log(JSON.stringify(data, null, 2));
+  return res.status(500).json({ error: "Audio tidak ditemukan" });
+}
 
-    const audioBuffer = Buffer.from(audioBase64, "base64");
+const audioBuffer = Buffer.from(audioBase64, "base64");
 
-    res.setHeader("Content-Type", "audio/wav");
-    res.send(audioBuffer);
+res.setHeader("Content-Type", "audio/wav");
+res.send(audioBuffer);
 
   } catch (err) {
     res.status(500).json({ error: err.message });
