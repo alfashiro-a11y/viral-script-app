@@ -13,18 +13,24 @@ export default async function handler(req, res) {
     const apiKey = process.env.GOOGLE_API_KEY;
 
     const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey,
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=" + apiKey,
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          contents: [{
-            parts: [{ text: text }]
-          }],
+          contents: [
+            {
+              parts: [{ text: text }]
+            }
+          ],
           generationConfig: {
-            responseModalities: ["AUDIO"]
+            responseModalities: ["AUDIO"],
+            audioConfig: {
+              audioEncoding: "LINEAR16",
+              sampleRateHertz: 24000
+            }
           }
         })
       }
@@ -32,7 +38,6 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    // Ambil base64 audio
     const audioBase64 =
       data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
 
